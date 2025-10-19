@@ -251,6 +251,11 @@ $functions"""
         """(Experimental) The timeout for code execution."""
         return self._timeout
 
+    @property
+    def delete_tmp_files(self) -> bool:
+        """(Experimental) Whether to delete temporary files after execution."""
+        return self._delete_tmp_files
+
     async def _setup_functions(self, cancellation_token: CancellationToken) -> None:
         func_file_content = build_python_functions_file(self._functions)
         func_file = self.work_dir / f"{self._functions_module}.py"
