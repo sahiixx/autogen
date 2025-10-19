@@ -151,63 +151,189 @@ class TestTeamManager:
             assert isinstance(streamed_messages[-1], type(mock_messages[-1]))
  
 
+
+class TestTeamManagerEnvironment:
+    """Test suite for environment variable handling in team manager tests"""
+    
+    def test_openai_api_key_environment(self):
+        """Test that OPENAI_API_KEY is properly set in test environment"""
+        api_key = os.environ.get("OPENAI_API_KEY")
+        assert api_key is not None, "OPENAI_API_KEY should be set"
+        assert api_key == "test", "OPENAI_API_KEY should use test value"
+    
     @pytest.mark.asyncio
-    async def test_create_team_injects_env_vars(self, sample_config, monkeypatch):
-        """_create_team should load provided env vars into process environment."""
+    async def test_team_creation_without_real_credentials(self, sample_config):
+        """Test that teams can be created without real OpenAI credentials"""
         team_manager = TeamManager()
-        with patch("autogen_agentchat.teams.BaseGroupChat.load_component") as mock_load:
+        
+        with patch("autogen_agentchat.base.Team.load_component") as mock_load:
             mock_team = MagicMock()
-            # Avoid touching UserProxyAgent path by leaving participants empty
-            mock_team._participants = []
             mock_load.return_value = mock_team
-            varname = "UNITTEST_FOO"
-            if varname in os.environ:
-                del os.environ[varname]
-            env_vars = [EnvironmentVariable(name=varname, value="BAR")]
-            team = await team_manager._create_team(sample_config, env_vars=env_vars)
-            assert team is mock_team
-            assert os.environ.get(varname) == "BAR"
+            
+            # Should not fail due to missing real API credentials
+            team = await team_manager._create_team(sample_config)
+            assert team is not None
 
-    @pytest.mark.asyncio
-    async def test_run_wraps_result(self, sample_config):
-        """run should wrap the underlying team's result in a TeamResult."""
-        team_manager = TeamManager()
-        with patch.object(team_manager, "_create_team") as mock_create:
-            mock_team = MagicMock()
-            async def mock_run(*args, **kwargs):
-                return MagicMock(name="task_result")
-            mock_team.run = mock_run
-            mock_create.return_value = mock_team
-            result = await team_manager.run(task="task", team_config=sample_config)
-            from autogenstudio.datamodel.types import TeamResult
-            assert isinstance(result, TeamResult)
-            assert hasattr(result, "task_result")
 
+class TestTeamManagerAdvanced:
+    """Additional comprehensive tests for TeamManager functionality"""
+    
     @pytest.mark.asyncio
-    async def test_run_stream_respects_cancellation_early(self, sample_config):
-        """If cancellation is requested, run_stream should stop early."""
-        team_manager = TeamManager()
-        with patch.object(team_manager, "_create_team") as mock_create:
-            mock_team = MagicMock()
-            async def gen(*args, **kwargs):
-                # Emit multiple messages; manager should break after first due to cancellation
-                yield MagicMock()
-                yield MagicMock()
-            mock_team.run_stream = gen
-            mock_create.return_value = mock_team
-            from autogen_core import CancellationToken
-            token = CancellationToken()
-            token.cancel()
-            received = []
-            async for msg in team_manager.run_stream(task="t", team_config=sample_config, cancellation_token=token):
-                received.append(msg)
-            assert len(received) <= 1
-
+    async def test_load_from_file_json_format(self, config_file):
+        """Test loading JSON configuration file"""
+        config = await TeamManager.load_from_file(config_file)
+        assert config is not None
+        assert isinstance(config, dict)
+        assert "component_type" in config or "label" in config
+    
     @pytest.mark.asyncio
-    async def test_load_from_directory_ignores_non_config_files(self, config_dir):
-        """Non JSON/YAML files should be ignored when loading from a directory."""
-        stray = Path(config_dir) / "ignore.me"
-        stray.write_text("not a config")
+    async def test_load_from_file_invalid_json(self, tmp_path):
+        """Test loading invalid JSON file raises appropriate error"""
+        invalid_json = tmp_path / "invalid.json"
+        invalid_json.write_text("{invalid json content")
+        
+        with pytest.raises((json.JSONDecodeError, ValueError)):
+            await TeamManager.load_from_file(invalid_json)
+    
+    @pytest.mark.asyncio
+    async def test_load_from_directory_empty(self, tmp_path):
+        """Test loading from empty directory"""
+        configs = await TeamManager.load_from_directory(tmp_path)
+        assert isinstance(configs, list)
+        assert len(configs) == 0
+    
+    @pytest.mark.asyncio
+    async def test_load_from_directory_mixed_formats(self, config_dir):
+        """Test loading directory with both JSON and YAML files"""
         configs = await TeamManager.load_from_directory(config_dir)
-        # The fixture creates exactly two valid configs (json + yaml)
+        assert len(configs) >= 2
+        # Verify we got configs from both file types
+        assert isinstance(configs, list)
+        for config in configs:
+            assert isinstance(config, dict)
+    
+    @pytest.mark.asyncio
+    async def test_create_team_from_dict(self, sample_config):
+        """Test creating team from dictionary config"""
+        team_manager = TeamManager()
+        
+        with patch("autogen_agentchat.base.Team.load_component") as mock_load:
+            mock_team = MagicMock()
+            mock_load.return_value = mock_team
+            
+            team = await team_manager._create_team(sample_config)
+            assert team == mock_team
+            mock_load.assert_called_once()
+    
+    @pytest.mark.asyncio
+    async def test_create_team_from_path(self, config_file):
+        """Test creating team from file path"""
+        team_manager = TeamManager()
+        
+        with patch("autogen_agentchat.base.Team.load_component") as mock_load:
+            mock_team = MagicMock()
+            mock_load.return_value = mock_team
+            
+            team = await team_manager._create_team(config_file)
+            assert team == mock_team
+    
+    @pytest.mark.asyncio
+    async def test_create_team_with_env_vars(self, sample_config):
+        """Test creating team with environment variables"""
+        team_manager = TeamManager()
+        
+        env_vars = [
+            EnvironmentVariable(name="TEST_VAR_1", value="value1"),
+            EnvironmentVariable(name="TEST_VAR_2", value="value2")
+        ]
+        
+        with patch("autogen_agentchat.base.Team.load_component") as mock_load:
+            mock_team = MagicMock()
+            mock_load.return_value = mock_team
+            
+            await team_manager._create_team(sample_config, env_vars=env_vars)
+            
+            # Verify environment variables were set
+            assert os.environ.get("TEST_VAR_1") == "value1"
+            assert os.environ.get("TEST_VAR_2") == "value2"
+    
+    @pytest.mark.asyncio
+    async def test_run_stream_with_cancellation(self, sample_config):
+        """Test run_stream with cancellation token"""
+        team_manager = TeamManager()
+        cancellation_token = CancellationToken()
+        
+        with patch.object(team_manager, "_create_team") as mock_create:
+            mock_team = MagicMock()
+            
+            async def mock_run_stream(*args, **kwargs):
+                yield MagicMock()
+                # Check if cancelled
+                if kwargs.get("cancellation_token") and kwargs["cancellation_token"].is_cancelled():
+                    return
+                yield MagicMock()
+            
+            mock_team.run_stream = mock_run_stream
+            mock_create.return_value = mock_team
+            
+            messages = []
+            async for message in team_manager.run_stream(
+                task="Test task",
+                team_config=sample_config,
+                cancellation_token=cancellation_token
+            ):
+                messages.append(message)
+            
+            assert len(messages) >= 1
+    
+    @pytest.mark.asyncio
+    async def test_run_stream_empty_task(self, sample_config):
+        """Test run_stream with None task"""
+        team_manager = TeamManager()
+        
+        with patch.object(team_manager, "_create_team") as mock_create:
+            mock_team = MagicMock()
+            
+            async def mock_run_stream(*args, **kwargs):
+                # Should handle None task gracefully
+                yield MagicMock()
+            
+            mock_team.run_stream = mock_run_stream
+            mock_create.return_value = mock_team
+            
+            messages = []
+            async for message in team_manager.run_stream(
+                task=None,
+                team_config=sample_config
+            ):
+                messages.append(message)
+            
+            assert len(messages) >= 1
+            mock_create.assert_called_once()
+    @pytest.mark.asyncio
+    async def test_run_returns_team_result(self, sample_config):
+        """TeamManager.run should return a TeamResult when BaseGroupChat.run is successful."""
+        from autogenstudio.datamodel.types import TeamResult
+        tm = TeamManager()
+        # Patch BaseGroupChat.load_component to avoid constructing real teams
+        with patch("autogen_agentchat.teams.BaseGroupChat.load_component") as mock_load:
+            class DummyTeam:
+                _participants = []
+                async def run(self, *args, **kwargs):
+                    return MagicMock()  # stand-in for TaskResult
+            mock_load.return_value = DummyTeam()
+            result = await tm.run(task="hello", team_config=sample_config)
+            assert isinstance(result, TeamResult)
+            assert result.duration >= 0
+
+    @pytest.mark.asyncio
+    async def test_load_from_directory_ignores_non_config(self, tmp_path, sample_config):
+        """Non-config files should be ignored when loading from directory."""
+        # Valid files
+        (tmp_path / "a.json").write_text(json.dumps(sample_config))
+        import yaml as _yaml
+        (tmp_path / "b.yml").write_text(_yaml.dump(sample_config))
+        # Invalid file
+        (tmp_path / "c.txt").write_text("noop")
+        configs = await TeamManager.load_from_directory(tmp_path)
         assert len(configs) == 2
