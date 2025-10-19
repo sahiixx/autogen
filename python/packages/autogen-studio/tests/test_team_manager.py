@@ -6,6 +6,9 @@ from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
 from autogenstudio.teammanager import TeamManager
+
+# Ensure tests don't require real OpenAI credentials
+os.environ.setdefault("OPENAI_API_KEY", "test")
 from autogenstudio.datamodel.types import TeamResult, EnvironmentVariable
 from autogen_core import CancellationToken
 

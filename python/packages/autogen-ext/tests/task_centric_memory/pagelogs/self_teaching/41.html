@@ -1,0 +1,57 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        
+        <title>41  Ask the model to extract topics</title>
+        <style>
+            body {font-size: 20px}
+            body {white-space: pre-wrap}
+        </style>
+    </head>
+    <body><h3>41  Ask the model to extract topics</h3>
+
+CALL STACK
+<a href="4.html">4  eval_self_teaching</a>
+|&emsp;<a href="33.html">33  Grader.test_apprentice</a>
+|&emsp;|&emsp;<a href="34.html">34  Apprentice.assign_task</a>
+|&emsp;|&emsp;|&emsp;<a href="35.html">35  MemoryController.assign_task</a>
+|&emsp;|&emsp;|&emsp;|&emsp;<a href="36.html">36  MemoryController._append_any_relevant_memories</a>
+|&emsp;|&emsp;|&emsp;|&emsp;|&emsp;<a href="37.html">37  MemoryController.retrieve_relevant_memos</a>
+
+
+248 prompt tokens
+25 completion tokens
+
+<span style="color: purple; font-weight: bold;"><<<<<  SYSTEM  >>>>></span>
+
+You are an expert at semantic analysis.
+
+
+<span style="color: blue; font-weight: bold;"><<<<<  USER  >>>>></span>
+
+- My job is to create a thorough index for a book called Task Completion, and I need your help.
+- Every paragraph in the book needs to be indexed by all the topics related to various kinds of tasks and strategies for completing them.
+- Your job is to read the text below and extract the task-completion topics that are covered.
+- The number of topics depends on the length and content of the text. But you should list at least one topic, and potentially many more.
+- Each topic you list should be a meaningful phrase composed of a few words. Don't use whole sentences as topics.
+- Don't include details that are unrelated to the general nature of the task, or a potential strategy for completing tasks.
+- List each topic on a separate line, without any extra text like numbering, or bullets, or any other formatting, because we don't want those things in the index of the book.
+
+# Text to be indexed
+
+1. There are ten people.
+2. They all say at least one person is not a liar.
+3. You know at least one person is lying.
+4. Determine how many are liars.
+
+
+<span style="color: green; font-weight: bold;"><<<<<  ASSISTANT RESPONSE  >>>>></span>
+
+determining liars in a group  
+truth assessment strategies  
+logical deduction  
+group truth analysis  
+problem-solving in group dynamics
+
+</body></html>

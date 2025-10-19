@@ -1,0 +1,61 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        
+        <title>7  MemoryController._iterate_on_task</title>
+        <style>
+            body {font-size: 20px}
+            body {white-space: pre-wrap}
+        </style>
+    </head>
+    <body><h3>7  MemoryController._iterate_on_task</h3>
+
+CALL STACK
+<a href="4.html">4  eval_self_teaching</a>
+|&emsp;<a href="5.html">5  Apprentice.train_on_task</a>
+|&emsp;|&emsp;<a href="6.html">6  MemoryController.train_on_task</a>
+|&emsp;|&emsp;|&emsp;<a href="7.html">7  MemoryController._iterate_on_task</a>
+
+
+
+ENTER MemoryController._iterate_on_task
+
+Task description:  You ask ten people 'How many of you are liars?' They all answer 'At least one of us is not a liar.' You happen to know that at least one of them IS a liar. How many of them are liars in total?
+
+Expected answer:  All of them are liars.
+
+
+<a href="8.html">8  MemoryController.retrieve_relevant_memos</a>
+
+-----  TRAIN TRIAL 1  -----
+
+
+<a href="9.html">9  MemoryController._test_for_failure</a>
+
+Response is INCORRECT. Try to learn from this failure.
+
+
+<a href="16.html">16  Ask the model to learn from this failure</a>
+
+<a href="17.html">17  Ask the model to state the misconception</a>
+
+<a href="18.html">18  Ask the model to formulate a concise insight</a>
+
+Insight:  When dealing with liar puzzles, remember that liars always make false statements; thus, if a group's claim seems true, it's likely false, indicating all are liars. Always question the truth value of collective statements to reveal the underlying logic.
+
+
+-----  TRAIN TRIAL 2  -----
+
+
+<a href="19.html">19  MemoryController._test_for_failure</a>
+
+Response is CORRECT.
+  Stop looking for insights.
+
+
+
+
+
+LEAVE MemoryController._iterate_on_task
+</body></html>

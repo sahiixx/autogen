@@ -1,0 +1,54 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        
+        <title>23  Ask the model to extract topics</title>
+        <style>
+            body {font-size: 20px}
+            body {white-space: pre-wrap}
+        </style>
+    </head>
+    <body><h3>23  Ask the model to extract topics</h3>
+
+CALL STACK
+<a href="4.html">4  eval_teachability</a>
+|&emsp;<a href="18.html">18  Apprentice.handle_user_message</a>
+|&emsp;|&emsp;<a href="19.html">19  MemoryController.handle_user_message</a>
+|&emsp;|&emsp;|&emsp;<a href="20.html">20  MemoryController.consider_memo_storage</a>
+|&emsp;|&emsp;|&emsp;|&emsp;<a href="22.html">22  MemoryController.add_memo</a>
+
+
+292 prompt tokens
+27 completion tokens
+
+<span style="color: purple; font-weight: bold;"><<<<<  SYSTEM  >>>>></span>
+
+You are an expert at semantic analysis.
+
+
+<span style="color: blue; font-weight: bold;"><<<<<  USER  >>>>></span>
+
+- My job is to create a thorough index for a book called Task Completion, and I need your help.
+- Every paragraph in the book needs to be indexed by all the topics related to various kinds of tasks and strategies for completing them.
+- Your job is to read the text below and extract the task-completion topics that are covered.
+- The number of topics depends on the length and content of the text. But you should list at least one topic, and potentially many more.
+- Each topic you list should be a meaningful phrase composed of a few words. Don't use whole sentences as topics.
+- Don't include details that are unrelated to the general nature of the task, or a potential strategy for completing tasks.
+- List each topic on a separate line, without any extra text like numbering, or bullets, or any other formatting, because we don't want those things in the index of the book.
+
+# Text to be indexed
+
+When somebody builds something on autogen and wants to contribute it to autogen, instead of creating a new autogen package, it's better for them to implement it in a separate github repo, then just add the autogen-extension topic to that repo. That way their contribution will be automatically discoverable through autogen's page on community extensions:  https://microsoft.github.io/autogen/dev/user-guide/extensions-user-guide/index.html
+
+
+<span style="color: green; font-weight: bold;"><<<<<  ASSISTANT RESPONSE  >>>>></span>
+
+autogen integration  
+community extensions  
+GitHub repository management  
+contribution discoverability  
+autogen-extension topic  
+separate implementation strategy
+
+</body></html>

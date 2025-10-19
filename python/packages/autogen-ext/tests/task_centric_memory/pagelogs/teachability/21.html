@@ -1,0 +1,45 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        
+        <title>21  Ask the model to extract advice</title>
+        <style>
+            body {font-size: 20px}
+            body {white-space: pre-wrap}
+        </style>
+    </head>
+    <body><h3>21  Ask the model to extract advice</h3>
+
+CALL STACK
+<a href="4.html">4  eval_teachability</a>
+|&emsp;<a href="18.html">18  Apprentice.handle_user_message</a>
+|&emsp;|&emsp;<a href="19.html">19  MemoryController.handle_user_message</a>
+|&emsp;|&emsp;|&emsp;<a href="20.html">20  MemoryController.consider_memo_storage</a>
+
+
+165 prompt tokens
+86 completion tokens
+
+<span style="color: purple; font-weight: bold;"><<<<<  SYSTEM  >>>>></span>
+
+You are a helpful and thoughtful assistant.
+
+
+<span style="color: blue; font-weight: bold;"><<<<<  USER  >>>>></span>
+
+Does the following text contain any information or advice that might be useful later?
+- If so, please copy the information or advice, adding no extra commentary or formatting.
+- If there is no potentially useful information or advice at all, simply write "None" with no punctuation.
+
+
+# Text to analyze
+
+When somebody builds something on autogen and wants to contribute it to autogen, instead of creating a new autogen package, it's better for them to implement it in a separate github repo, then just add the autogen-extension topic to that repo. That way their contribution will be automatically discoverable through autogen's page on community extensions:  https://microsoft.github.io/autogen/dev/user-guide/extensions-user-guide/index.html
+
+
+<span style="color: green; font-weight: bold;"><<<<<  ASSISTANT RESPONSE  >>>>></span>
+
+When somebody builds something on autogen and wants to contribute it to autogen, instead of creating a new autogen package, it's better for them to implement it in a separate github repo, then just add the autogen-extension topic to that repo. That way their contribution will be automatically discoverable through autogen's page on community extensions:  https://microsoft.github.io/autogen/dev/user-guide/extensions-user-guide/index.html
+
+</body></html>

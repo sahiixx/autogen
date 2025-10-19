@@ -316,6 +316,9 @@ async def test_deprecated_warning() -> None:
 
 @pytest.mark.asyncio
 async def test_directory_creation_cleanup() -> None:
+    if not docker_tests_enabled():
+        pytest.skip("Docker tests are disabled")
+
     executor = DockerCommandLineCodeExecutor(timeout=60, work_dir=None)
 
     await executor.start()

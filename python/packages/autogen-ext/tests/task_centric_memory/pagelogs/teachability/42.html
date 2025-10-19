@@ -1,0 +1,54 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        
+        <title>42  Ask the model to validate the insight</title>
+        <style>
+            body {font-size: 20px}
+            body {white-space: pre-wrap}
+        </style>
+    </head>
+    <body><h3>42  Ask the model to validate the insight</h3>
+
+CALL STACK
+<a href="4.html">4  eval_teachability</a>
+|&emsp;<a href="30.html">30  Apprentice.handle_user_message</a>
+|&emsp;|&emsp;<a href="31.html">31  MemoryController.handle_user_message</a>
+|&emsp;|&emsp;|&emsp;<a href="34.html">34  MemoryController.assign_task</a>
+|&emsp;|&emsp;|&emsp;|&emsp;<a href="35.html">35  MemoryController._append_any_relevant_memories</a>
+|&emsp;|&emsp;|&emsp;|&emsp;|&emsp;<a href="36.html">36  MemoryController.retrieve_relevant_memos</a>
+
+
+223 prompt tokens
+2 completion tokens
+
+<span style="color: purple; font-weight: bold;"><<<<<  SYSTEM  >>>>></span>
+
+You are a helpful and thoughtful assistant.
+
+
+<span style="color: blue; font-weight: bold;"><<<<<  USER  >>>>></span>
+
+We have been given a potential insight that may or may not be useful for solving a given task.
+- First review the following task.
+- Then review the insight that follows, and consider whether it might help solve the given task.
+- Do not attempt to actually solve the task.
+- Reply with a single character, '1' if the insight may be useful, or '0' if it is not.
+
+
+# Task description
+
+As a contribution to autogen, can I create a new autogen package for a copilot extension agent that I built on autogen?
+
+
+# Possibly useful insight
+
+When somebody builds something on autogen and wants to contribute it to autogen, instead of creating a new autogen package, it's better for them to implement it in a separate github repo, then just add the autogen-extension topic to that repo. That way their contribution will be automatically discoverable through autogen's page on community extensions:  https://microsoft.github.io/autogen/dev/user-guide/extensions-user-guide/index.html
+
+
+<span style="color: green; font-weight: bold;"><<<<<  ASSISTANT RESPONSE  >>>>></span>
+
+1
+
+</body></html>

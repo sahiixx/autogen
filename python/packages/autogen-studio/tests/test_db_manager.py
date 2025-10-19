@@ -1,9 +1,13 @@
 import asyncio 
 import pytest
+import os
 from sqlmodel import Session, text, select
 from typing import Generator
 
 from autogenstudio.database import DatabaseManager
+
+# Ensure tests don't require real OpenAI credentials
+os.environ.setdefault("OPENAI_API_KEY", "test")
 from autogen_agentchat.agents import AssistantAgent
 from autogen_agentchat.teams import RoundRobinGroupChat
 from autogen_ext.models.openai import OpenAIChatCompletionClient

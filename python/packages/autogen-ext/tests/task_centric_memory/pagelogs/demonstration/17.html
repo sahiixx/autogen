@@ -1,0 +1,43 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        
+        <title>17  MemoryController.add_task_solution_pair_to_memory</title>
+        <style>
+            body {font-size: 20px}
+            body {white-space: pre-wrap}
+        </style>
+    </head>
+    <body><h3>17  MemoryController.add_task_solution_pair_to_memory</h3>
+
+CALL STACK
+<a href="4.html">4  eval_learning_from_demonstration</a>
+|&emsp;<a href="16.html">16  Apprentice.add_task_solution_pair_to_memory</a>
+|&emsp;|&emsp;<a href="17.html">17  MemoryController.add_task_solution_pair_to_memory</a>
+
+
+
+ENTER MemoryController.add_task_solution_pair_to_memory
+
+EXAMPLE TASK:
+You are a telecommunications engineer who wants to build cell phone towers on a stretch of road. Houses are located at mile markers 17, 20, 19, 10, 11, 12, 3, 6. Each cell phone tower can cover houses located next to the road within a 4-mile radius. Find the minimum number of cell phone towers needed to cover all houses next to the road. Your answer should be a positive numerical integer value.
+
+EXAMPLE SOLUTION:
+Sort the houses by location:  3, 6, 10, 11, 12, 17, 19, 20. Then start at one end and place the towers only where absolutely needed. The house at 3 could be served by a tower as far away as mile marker 7, because 3 + 4 = 7, so place a tower at 7. This obviously covers houses up to mile 7. But a coverage radius of 4 miles (in each direction) means a total coverage of 8 miles. So the tower at mile 7 would reach all the way to mile 11, covering the houses at 10 and 11. The next uncovered house would be at mile 12 (not 10), requiring a second tower. It could go at mile 16 (which is 12 + 4) and this tower would reach up to mile 20 (16 + 4), covering the remaining houses. So 2 towers would be enough.
+
+<a href="18.html">18  Ask the model to extract topics</a>
+
+TOPICS EXTRACTED FROM TASK:
+Telecommunications engineering  
+Cell phone tower placement  
+Coverage radius calculation  
+House location analysis  
+Minimum resource allocation  
+Optimizing coverage strategy
+
+
+<a href="19.html">19  MemoryBank.add_task_with_solution</a>
+
+LEAVE MemoryController.add_task_solution_pair_to_memory
+</body></html>

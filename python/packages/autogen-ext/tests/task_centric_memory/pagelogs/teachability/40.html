@@ -1,0 +1,55 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        
+        <title>40  Ask the model to extract topics</title>
+        <style>
+            body {font-size: 20px}
+            body {white-space: pre-wrap}
+        </style>
+    </head>
+    <body><h3>40  Ask the model to extract topics</h3>
+
+CALL STACK
+<a href="4.html">4  eval_teachability</a>
+|&emsp;<a href="30.html">30  Apprentice.handle_user_message</a>
+|&emsp;|&emsp;<a href="31.html">31  MemoryController.handle_user_message</a>
+|&emsp;|&emsp;|&emsp;<a href="34.html">34  MemoryController.assign_task</a>
+|&emsp;|&emsp;|&emsp;|&emsp;<a href="35.html">35  MemoryController._append_any_relevant_memories</a>
+|&emsp;|&emsp;|&emsp;|&emsp;|&emsp;<a href="36.html">36  MemoryController.retrieve_relevant_memos</a>
+
+
+233 prompt tokens
+19 completion tokens
+
+<span style="color: purple; font-weight: bold;"><<<<<  SYSTEM  >>>>></span>
+
+You are an expert at semantic analysis.
+
+
+<span style="color: blue; font-weight: bold;"><<<<<  USER  >>>>></span>
+
+- My job is to create a thorough index for a book called Task Completion, and I need your help.
+- Every paragraph in the book needs to be indexed by all the topics related to various kinds of tasks and strategies for completing them.
+- Your job is to read the text below and extract the task-completion topics that are covered.
+- The number of topics depends on the length and content of the text. But you should list at least one topic, and potentially many more.
+- Each topic you list should be a meaningful phrase composed of a few words. Don't use whole sentences as topics.
+- Don't include details that are unrelated to the general nature of the task, or a potential strategy for completing tasks.
+- List each topic on a separate line, without any extra text like numbering, or bullets, or any other formatting, because we don't want those things in the index of the book.
+
+# Text to be indexed
+
+1. Contribute to autogen.
+2. Create a new package.
+3. Package is for a copilot extension agent.
+
+
+<span style="color: green; font-weight: bold;"><<<<<  ASSISTANT RESPONSE  >>>>></span>
+
+Contributing to projects  
+Creating software packages  
+Developing extensions  
+Collaborating with AI agents
+
+</body></html>
