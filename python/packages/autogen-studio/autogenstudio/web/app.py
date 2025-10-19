@@ -15,7 +15,7 @@ from .auth.middleware import AuthMiddleware
 from .config import settings
 from .deps import cleanup_managers, init_auth_manager, init_managers, register_auth_dependencies
 from .initialization import AppInitializer
-from .routes import gallery, mcp, runs, sessions, settingsroute, teams, validation, ws
+from .routes import gallery, mcp, runs, sessions, settingsroute, teams, validation, ws, analytics, export as export_routes, streaming
 
 # Initialize application
 app_file_path = os.path.dirname(os.path.abspath(__file__))
@@ -152,6 +152,30 @@ api.include_router(
     mcp.router,
     prefix="/mcp",
     tags=["mcp"],
+    responses={404: {"description": "Not found"}},
+)
+
+# Enhanced features - Analytics
+api.include_router(
+    analytics.router,
+    prefix="/analytics",
+    tags=["analytics"],
+    responses={404: {"description": "Not found"}},
+)
+
+# Enhanced features - Export/Import
+api.include_router(
+    export_routes.router,
+    prefix="/export",
+    tags=["export"],
+    responses={404: {"description": "Not found"}},
+)
+
+# Enhanced features - Streaming
+api.include_router(
+    streaming.router,
+    prefix="/streaming",
+    tags=["streaming"],
     responses={404: {"description": "Not found"}},
 )
 
