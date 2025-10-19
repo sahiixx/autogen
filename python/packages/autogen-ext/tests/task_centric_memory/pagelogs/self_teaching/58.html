@@ -1,0 +1,60 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        
+        <title>58  Ask the model to extract topics</title>
+        <style>
+            body {font-size: 20px}
+            body {white-space: pre-wrap}
+        </style>
+    </head>
+    <body><h3>58  Ask the model to extract topics</h3>
+
+CALL STACK
+<a href="4.html">4  eval_self_teaching</a>
+|&emsp;<a href="50.html">50  Grader.test_apprentice</a>
+|&emsp;|&emsp;<a href="51.html">51  Apprentice.assign_task</a>
+|&emsp;|&emsp;|&emsp;<a href="52.html">52  MemoryController.assign_task</a>
+|&emsp;|&emsp;|&emsp;|&emsp;<a href="53.html">53  MemoryController._append_any_relevant_memories</a>
+|&emsp;|&emsp;|&emsp;|&emsp;|&emsp;<a href="54.html">54  MemoryController.retrieve_relevant_memos</a>
+
+
+296 prompt tokens
+22 completion tokens
+
+<span style="color: purple; font-weight: bold;"><<<<<  SYSTEM  >>>>></span>
+
+You are an expert at semantic analysis.
+
+
+<span style="color: blue; font-weight: bold;"><<<<<  USER  >>>>></span>
+
+- My job is to create a thorough index for a book called Task Completion, and I need your help.
+- Every paragraph in the book needs to be indexed by all the topics related to various kinds of tasks and strategies for completing them.
+- Your job is to read the text below and extract the task-completion topics that are covered.
+- The number of topics depends on the length and content of the text. But you should list at least one topic, and potentially many more.
+- Each topic you list should be a meaningful phrase composed of a few words. Don't use whole sentences as topics.
+- Don't include details that are unrelated to the general nature of the task, or a potential strategy for completing tasks.
+- List each topic on a separate line, without any extra text like numbering, or bullets, or any other formatting, because we don't want those things in the index of the book.
+
+# Text to be indexed
+
+1. You are tasked with investigating a village called Șirnea.
+2. A vampire was reportedly seen near the village.
+3. The vampire must be a resident of the village.
+4. The village has 100 residents.
+5. Humans tell the truth; vampires always lie.
+6. You ask each resident if there is at least one human among them.
+7. All residents respond, "At least one of us is a human."
+
+
+<span style="color: green; font-weight: bold;"><<<<<  ASSISTANT RESPONSE  >>>>></span>
+
+Investigating a village  
+Identifying vampires  
+Truth-telling strategy  
+Lying detection  
+Interviewing residents
+
+</body></html>

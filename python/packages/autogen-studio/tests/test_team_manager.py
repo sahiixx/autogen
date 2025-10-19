@@ -6,6 +6,9 @@ from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
 from autogenstudio.teammanager import TeamManager
+
+# Ensure tests don't require real OpenAI credentials
+os.environ.setdefault("OPENAI_API_KEY", "test")
 from autogenstudio.datamodel.types import TeamResult, EnvironmentVariable
 from autogen_core import CancellationToken
 
@@ -147,3 +150,64 @@ class TestTeamManager:
             # Verify the last message is a TeamResult
             assert isinstance(streamed_messages[-1], type(mock_messages[-1]))
  
+
+    @pytest.mark.asyncio
+    async def test_create_team_injects_env_vars(self, sample_config, monkeypatch):
+        """_create_team should load provided env vars into process environment."""
+        team_manager = TeamManager()
+        with patch("autogen_agentchat.teams.BaseGroupChat.load_component") as mock_load:
+            mock_team = MagicMock()
+            # Avoid touching UserProxyAgent path by leaving participants empty
+            mock_team._participants = []
+            mock_load.return_value = mock_team
+            varname = "UNITTEST_FOO"
+            if varname in os.environ:
+                del os.environ[varname]
+            env_vars = [EnvironmentVariable(name=varname, value="BAR")]
+            team = await team_manager._create_team(sample_config, env_vars=env_vars)
+            assert team is mock_team
+            assert os.environ.get(varname) == "BAR"
+
+    @pytest.mark.asyncio
+    async def test_run_wraps_result(self, sample_config):
+        """run should wrap the underlying team's result in a TeamResult."""
+        team_manager = TeamManager()
+        with patch.object(team_manager, "_create_team") as mock_create:
+            mock_team = MagicMock()
+            async def mock_run(*args, **kwargs):
+                return MagicMock(name="task_result")
+            mock_team.run = mock_run
+            mock_create.return_value = mock_team
+            result = await team_manager.run(task="task", team_config=sample_config)
+            from autogenstudio.datamodel.types import TeamResult
+            assert isinstance(result, TeamResult)
+            assert hasattr(result, "task_result")
+
+    @pytest.mark.asyncio
+    async def test_run_stream_respects_cancellation_early(self, sample_config):
+        """If cancellation is requested, run_stream should stop early."""
+        team_manager = TeamManager()
+        with patch.object(team_manager, "_create_team") as mock_create:
+            mock_team = MagicMock()
+            async def gen(*args, **kwargs):
+                # Emit multiple messages; manager should break after first due to cancellation
+                yield MagicMock()
+                yield MagicMock()
+            mock_team.run_stream = gen
+            mock_create.return_value = mock_team
+            from autogen_core import CancellationToken
+            token = CancellationToken()
+            token.cancel()
+            received = []
+            async for msg in team_manager.run_stream(task="t", team_config=sample_config, cancellation_token=token):
+                received.append(msg)
+            assert len(received) <= 1
+
+    @pytest.mark.asyncio
+    async def test_load_from_directory_ignores_non_config_files(self, config_dir):
+        """Non JSON/YAML files should be ignored when loading from a directory."""
+        stray = Path(config_dir) / "ignore.me"
+        stray.write_text("not a config")
+        configs = await TeamManager.load_from_directory(config_dir)
+        # The fixture creates exactly two valid configs (json + yaml)
+        assert len(configs) == 2

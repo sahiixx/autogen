@@ -316,6 +316,9 @@ async def test_deprecated_warning() -> None:
 
 @pytest.mark.asyncio
 async def test_directory_creation_cleanup() -> None:
+    if not docker_tests_enabled():
+        pytest.skip("Docker tests are disabled")
+
     executor = DockerCommandLineCodeExecutor(timeout=60, work_dir=None)
 
     await executor.start()
@@ -398,3 +401,12 @@ async def test_docker_commandline_code_executor_with_multiple_tasks(
 
     executor, _ = executor_and_temp_dir
     await asyncio.get_running_loop().run_in_executor(None, run_scenario_in_new_loop, executor)
+def test_serialization_roundtrip_preserves_delete_tmp_files() -> None:
+    # This test does not require Docker; it only validates config round‑trip behavior.
+    with tempfile.TemporaryDirectory() as temp_dir:
+        executor = DockerCommandLineCodeExecutor(work_dir=temp_dir, timeout=12, delete_tmp_files=True)
+        cfg = executor.dump_component()
+        loaded = DockerCommandLineCodeExecutor.load_component(cfg)
+        assert loaded.timeout == 12
+        # Be defensive if attribute name changes — treat missing as False
+        assert getattr(loaded, "delete_tmp_files", False) is True

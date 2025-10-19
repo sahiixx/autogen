@@ -1,0 +1,52 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        
+        <title>18  Ask the model to extract topics</title>
+        <style>
+            body {font-size: 20px}
+            body {white-space: pre-wrap}
+        </style>
+    </head>
+    <body><h3>18  Ask the model to extract topics</h3>
+
+CALL STACK
+<a href="4.html">4  eval_learning_from_demonstration</a>
+|&emsp;<a href="16.html">16  Apprentice.add_task_solution_pair_to_memory</a>
+|&emsp;|&emsp;<a href="17.html">17  MemoryController.add_task_solution_pair_to_memory</a>
+
+
+302 prompt tokens
+26 completion tokens
+
+<span style="color: purple; font-weight: bold;"><<<<<  SYSTEM  >>>>></span>
+
+You are an expert at semantic analysis.
+
+
+<span style="color: blue; font-weight: bold;"><<<<<  USER  >>>>></span>
+
+- My job is to create a thorough index for a book called Task Completion, and I need your help.
+- Every paragraph in the book needs to be indexed by all the topics related to various kinds of tasks and strategies for completing them.
+- Your job is to read the text below and extract the task-completion topics that are covered.
+- The number of topics depends on the length and content of the text. But you should list at least one topic, and potentially many more.
+- Each topic you list should be a meaningful phrase composed of a few words. Don't use whole sentences as topics.
+- Don't include details that are unrelated to the general nature of the task, or a potential strategy for completing tasks.
+- List each topic on a separate line, without any extra text like numbering, or bullets, or any other formatting, because we don't want those things in the index of the book.
+
+# Text to be indexed
+
+You are a telecommunications engineer who wants to build cell phone towers on a stretch of road. Houses are located at mile markers 17, 20, 19, 10, 11, 12, 3, 6. Each cell phone tower can cover houses located next to the road within a 4-mile radius. Find the minimum number of cell phone towers needed to cover all houses next to the road. Your answer should be a positive numerical integer value.
+
+
+<span style="color: green; font-weight: bold;"><<<<<  ASSISTANT RESPONSE  >>>>></span>
+
+Telecommunications engineering  
+Cell phone tower placement  
+Coverage radius calculation  
+House location analysis  
+Minimum resource allocation  
+Optimizing coverage strategy
+
+</body></html>

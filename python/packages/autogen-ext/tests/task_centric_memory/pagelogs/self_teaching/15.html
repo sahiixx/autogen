@@ -1,0 +1,62 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        
+        <title>15  Ask the model to check the answer for correctness</title>
+        <style>
+            body {font-size: 20px}
+            body {white-space: pre-wrap}
+        </style>
+    </head>
+    <body><h3>15  Ask the model to check the answer for correctness</h3>
+
+CALL STACK
+<a href="4.html">4  eval_self_teaching</a>
+|&emsp;<a href="5.html">5  Apprentice.train_on_task</a>
+|&emsp;|&emsp;<a href="6.html">6  MemoryController.train_on_task</a>
+|&emsp;|&emsp;|&emsp;<a href="7.html">7  MemoryController._iterate_on_task</a>
+|&emsp;|&emsp;|&emsp;|&emsp;<a href="9.html">9  MemoryController._test_for_failure</a>
+|&emsp;|&emsp;|&emsp;|&emsp;|&emsp;<a href="13.html">13  Grader.is_response_correct</a>
+
+
+272 prompt tokens
+2 completion tokens
+
+<span style="color: purple; font-weight: bold;"><<<<<  SYSTEM  >>>>></span>
+
+You are a helpful and thoughtful assistant.
+
+
+<span style="color: blue; font-weight: bold;"><<<<<  USER  >>>>></span>
+
+Your job is to decide whether a given answer to a task is correct or not.
+- You will be given the task description and the correct, gold-standard answer, along with the answer to be graded.
+- In general, an answer is correct if it is equivalent to the correct answer.
+- Specifically, the given answer must contain the important information from the correct answer, and must not in any way contradict the correct answer.
+- Ignore any differences of grammar, spelling mistakes, punctuation, capitalization, formatting, or extra commentary.
+- An answer should be considered correct if it omits information that is clearly inferred.
+  - For instance, if the correct answer is "Paris, France", the answer "Paris" should be considered correct.
+- Respond with a single character: '1' if the answer to be graded is correct", '0' if not.
+
+
+# Task description
+
+You ask ten people 'How many of you are liars?' They all answer 'At least one of us is not a liar.' You happen to know that at least one of them IS a liar. How many of them are liars in total?
+
+
+# Correct answer
+
+All of them are liars.
+
+
+# Answer to be graded
+
+In total, nine of them are liars.
+
+
+<span style="color: green; font-weight: bold;"><<<<<  ASSISTANT RESPONSE  >>>>></span>
+
+0
+
+</body></html>

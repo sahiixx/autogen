@@ -1,0 +1,58 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        
+        <title>17  Ask the model to check the answer for correctness</title>
+        <style>
+            body {font-size: 20px}
+            body {white-space: pre-wrap}
+        </style>
+    </head>
+    <body><h3>17  Ask the model to check the answer for correctness</h3>
+
+CALL STACK
+<a href="4.html">4  eval_teachability</a>
+|&emsp;<a href="15.html">15  Grader.is_response_correct</a>
+
+
+300 prompt tokens
+2 completion tokens
+
+<span style="color: purple; font-weight: bold;"><<<<<  SYSTEM  >>>>></span>
+
+You are a helpful and thoughtful assistant.
+
+
+<span style="color: blue; font-weight: bold;"><<<<<  USER  >>>>></span>
+
+Your job is to decide whether a given answer to a task is correct or not.
+- You will be given the task description and the correct, gold-standard answer, along with the answer to be graded.
+- In general, an answer is correct if it is equivalent to the correct answer.
+- Specifically, the given answer must contain the important information from the correct answer, and must not in any way contradict the correct answer.
+- Ignore any differences of grammar, spelling mistakes, punctuation, capitalization, formatting, or extra commentary.
+- An answer should be considered correct if it omits information that is clearly inferred.
+  - For instance, if the correct answer is "Paris, France", the answer "Paris" should be considered correct.
+- Respond with a single character: '1' if the answer to be graded is correct", '0' if not.
+
+
+# Task description
+
+As a contribution to autogen, can I create a new autogen package for a copilot extension agent that I built on autogen?
+
+
+# Correct answer
+
+It's best to have your agent in its own repo, then add the autogen-extension topic to that repo.
+
+
+# Answer to be graded
+
+Yes, you can potentially create and contribute a new package to the `autogen` framework. To ensure you're following the correct process and guidelines, I recommend contacting the maintainers of `autogen` for specific instructions regarding contributions.
+
+
+<span style="color: green; font-weight: bold;"><<<<<  ASSISTANT RESPONSE  >>>>></span>
+
+0
+
+</body></html>

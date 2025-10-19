@@ -1,0 +1,235 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        
+        <title>30  MemoryBank.get_relevant_memos</title>
+        <style>
+            body {font-size: 20px}
+            body {white-space: pre-wrap}
+        </style>
+    </head>
+    <body><h3>30  MemoryBank.get_relevant_memos</h3>
+
+CALL STACK
+<a href="4.html">4  eval_learning_from_demonstration</a>
+|&emsp;<a href="21.html">21  Grader.test_apprentice</a>
+|&emsp;|&emsp;<a href="22.html">22  Apprentice.assign_task</a>
+|&emsp;|&emsp;|&emsp;<a href="23.html">23  MemoryController.assign_task</a>
+|&emsp;|&emsp;|&emsp;|&emsp;<a href="24.html">24  MemoryController._append_any_relevant_memories</a>
+|&emsp;|&emsp;|&emsp;|&emsp;|&emsp;<a href="25.html">25  MemoryController.retrieve_relevant_memos</a>
+|&emsp;|&emsp;|&emsp;|&emsp;|&emsp;|&emsp;<a href="30.html">30  MemoryBank.get_relevant_memos</a>
+
+
+
+ENTER MemoryBank.get_relevant_memos
+
+INPUT-OUTPUT PAIR RETRIEVED FROM VECTOR DATABASE:
+  INPUT1
+    House location analysis  
+  OUTPUT
+    1
+  DISTANCE
+    0.47793465852737427
+
+INPUT-OUTPUT PAIR RETRIEVED FROM VECTOR DATABASE:
+  INPUT1
+    Cell phone tower placement  
+  OUTPUT
+    1
+  DISTANCE
+    1.4712913036346436
+
+INPUT-OUTPUT PAIR RETRIEVED FROM VECTOR DATABASE:
+  INPUT1
+    Optimizing coverage strategy
+  OUTPUT
+    1
+  DISTANCE
+    1.6928561925888062
+
+INPUT-OUTPUT PAIR RETRIEVED FROM VECTOR DATABASE:
+  INPUT1
+    Telecommunications engineering  
+  OUTPUT
+    1
+  DISTANCE
+    1.806984543800354
+
+INPUT-OUTPUT PAIR RETRIEVED FROM VECTOR DATABASE:
+  INPUT1
+    Coverage radius calculation  
+  OUTPUT
+    1
+  DISTANCE
+    1.8204777240753174
+
+INPUT-OUTPUT PAIR RETRIEVED FROM VECTOR DATABASE:
+  INPUT1
+    Minimum resource allocation  
+  OUTPUT
+    1
+  DISTANCE
+    1.8494099378585815
+
+INPUT-OUTPUT PAIR RETRIEVED FROM VECTOR DATABASE:
+  INPUT1
+    Coverage radius calculation  
+  OUTPUT
+    1
+  DISTANCE
+    0.14093956351280212
+
+INPUT-OUTPUT PAIR RETRIEVED FROM VECTOR DATABASE:
+  INPUT1
+    Optimizing coverage strategy
+  OUTPUT
+    1
+  DISTANCE
+    0.7571708559989929
+
+INPUT-OUTPUT PAIR RETRIEVED FROM VECTOR DATABASE:
+  INPUT1
+    House location analysis  
+  OUTPUT
+    1
+  DISTANCE
+    1.535994529724121
+
+INPUT-OUTPUT PAIR RETRIEVED FROM VECTOR DATABASE:
+  INPUT1
+    Cell phone tower placement  
+  OUTPUT
+    1
+  DISTANCE
+    1.6416544914245605
+
+INPUT-OUTPUT PAIR RETRIEVED FROM VECTOR DATABASE:
+  INPUT1
+    Telecommunications engineering  
+  OUTPUT
+    1
+  DISTANCE
+    1.714555263519287
+
+INPUT-OUTPUT PAIR RETRIEVED FROM VECTOR DATABASE:
+  INPUT1
+    Minimum resource allocation  
+  OUTPUT
+    1
+  DISTANCE
+    1.7360000610351562
+
+INPUT-OUTPUT PAIR RETRIEVED FROM VECTOR DATABASE:
+  INPUT1
+    Optimizing coverage strategy
+  OUTPUT
+    1
+  DISTANCE
+    0.16361519694328308
+
+INPUT-OUTPUT PAIR RETRIEVED FROM VECTOR DATABASE:
+  INPUT1
+    Coverage radius calculation  
+  OUTPUT
+    1
+  DISTANCE
+    0.8510473966598511
+
+INPUT-OUTPUT PAIR RETRIEVED FROM VECTOR DATABASE:
+  INPUT1
+    Minimum resource allocation  
+  OUTPUT
+    1
+  DISTANCE
+    1.2053735256195068
+
+INPUT-OUTPUT PAIR RETRIEVED FROM VECTOR DATABASE:
+  INPUT1
+    House location analysis  
+  OUTPUT
+    1
+  DISTANCE
+    1.5290005207061768
+
+INPUT-OUTPUT PAIR RETRIEVED FROM VECTOR DATABASE:
+  INPUT1
+    Telecommunications engineering  
+  OUTPUT
+    1
+  DISTANCE
+    1.5997397899627686
+
+INPUT-OUTPUT PAIR RETRIEVED FROM VECTOR DATABASE:
+  INPUT1
+    Cell phone tower placement  
+  OUTPUT
+    1
+  DISTANCE
+    1.630711317062378
+
+INPUT-OUTPUT PAIR RETRIEVED FROM VECTOR DATABASE:
+  INPUT1
+    Minimum resource allocation  
+  OUTPUT
+    1
+  DISTANCE
+    0.3611774742603302
+
+INPUT-OUTPUT PAIR RETRIEVED FROM VECTOR DATABASE:
+  INPUT1
+    Optimizing coverage strategy
+  OUTPUT
+    1
+  DISTANCE
+    1.3114550113677979
+
+INPUT-OUTPUT PAIR RETRIEVED FROM VECTOR DATABASE:
+  INPUT1
+    Telecommunications engineering  
+  OUTPUT
+    1
+  DISTANCE
+    1.699073314666748
+
+INPUT-OUTPUT PAIR RETRIEVED FROM VECTOR DATABASE:
+  INPUT1
+    Cell phone tower placement  
+  OUTPUT
+    1
+  DISTANCE
+    1.7294851541519165
+
+INPUT-OUTPUT PAIR RETRIEVED FROM VECTOR DATABASE:
+  INPUT1
+    House location analysis  
+  OUTPUT
+    1
+  DISTANCE
+    1.7371776103973389
+
+INPUT-OUTPUT PAIR RETRIEVED FROM VECTOR DATABASE:
+  INPUT1
+    Coverage radius calculation  
+  OUTPUT
+    1
+  DISTANCE
+    1.801297903060913
+
+1 POTENTIALLY RELEVANT MEMOS
+
+  TASK: You are a telecommunications engineer who wants to build cell phone towers on a stretch of road. Houses are located at mile markers 17, 20, 19, 10, 11, 12, 3, 6. Each cell phone tower can cover houses located next to the road within a 4-mile radius. Find the minimum number of cell phone towers needed to cover all houses next to the road. Your answer should be a positive numerical integer value.
+
+  INSIGHT: Example task:
+
+You are a telecommunications engineer who wants to build cell phone towers on a stretch of road. Houses are located at mile markers 17, 20, 19, 10, 11, 12, 3, 6. Each cell phone tower can cover houses located next to the road within a 4-mile radius. Find the minimum number of cell phone towers needed to cover all houses next to the road. Your answer should be a positive numerical integer value.
+
+Example solution:
+
+Sort the houses by location:  3, 6, 10, 11, 12, 17, 19, 20. Then start at one end and place the towers only where absolutely needed. The house at 3 could be served by a tower as far away as mile marker 7, because 3 + 4 = 7, so place a tower at 7. This obviously covers houses up to mile 7. But a coverage radius of 4 miles (in each direction) means a total coverage of 8 miles. So the tower at mile 7 would reach all the way to mile 11, covering the houses at 10 and 11. The next uncovered house would be at mile 12 (not 10), requiring a second tower. It could go at mile 16 (which is 12 + 4) and this tower would reach up to mile 20 (16 + 4), covering the remaining houses. So 2 towers would be enough.
+
+  RELEVANCE: 8.536
+
+
+LEAVE MemoryBank.get_relevant_memos
+</body></html>

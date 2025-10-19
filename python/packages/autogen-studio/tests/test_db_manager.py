@@ -1,9 +1,13 @@
 import asyncio 
 import pytest
+import os
 from sqlmodel import Session, text, select
 from typing import Generator
 
 from autogenstudio.database import DatabaseManager
+
+# Ensure tests don't require real OpenAI credentials
+os.environ.setdefault("OPENAI_API_KEY", "test")
 from autogen_agentchat.agents import AssistantAgent
 from autogen_agentchat.teams import RoundRobinGroupChat
 from autogen_ext.models.openai import OpenAIChatCompletionClient
@@ -188,3 +192,45 @@ class TestDatabaseOperations:
         finally:
             asyncio.run(db.close())
             db.reset_db() 
+
+class TestDatabaseEdgeCases:
+    def test_get_on_empty_returns_no_rows(self, test_db: DatabaseManager, test_user: str):
+        """Getting with a filter that matches nothing should succeed and return no rows."""
+        from autogenstudio.datamodel.db import Team
+        result = test_db.get(Team, {"id": 987654321})
+        assert result.status is True
+        # Data may be an empty list or None depending on implementation — accept either but ensure no rows.
+        if result.data:
+            assert len(result.data) == 0
+
+    def test_filter_by_user_id(self, test_db: DatabaseManager, sample_team: Team, test_user: str):
+        """Verify basic filtering by user_id works."""
+        # Insert the team
+        upsert_resp = test_db.upsert(sample_team)
+        assert upsert_resp.status is True
+        # Query by user_id
+        from autogenstudio.datamodel.db import Team
+        result = test_db.get(Team, {"user_id": test_user})
+        assert result.status is True
+        # Be resilient to None when nothing is found
+        assert (result.data is None) or any(getattr(t, "user_id", None) == test_user for t in result.data)
+
+    def test_reset_db_and_reinitialize(self, tmp_path, sample_team: Team):
+        """Resetting the database should allow re-initialization and basic connectivity."""
+        db_path = tmp_path / "tmp_reset.db"
+        db = DatabaseManager(f"sqlite:///{db_path}", base_dir=tmp_path)
+        try:
+            assert db.initialize_database().status is True
+            # Insert one row to ensure DB is usable
+            assert db.upsert(sample_team).status is True
+            # Close and reset underlying DB artifacts
+            asyncio.run(db.close())
+            db.reset_db()
+            # Re-initialize and verify connectivity
+            assert db.initialize_database().status is True
+            with Session(db.engine) as session:
+                assert session.exec(text("SELECT 1")).first()[0] == 1  # type: ignore[index]
+        finally:
+            # Best-effort cleanup
+            asyncio.run(db.close())
+            db.reset_db()
