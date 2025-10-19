@@ -15,6 +15,8 @@ from autogen_agentchat.teams import BaseGroupChat
 from autogen_core import EVENT_LOGGER_NAME, CancellationToken, ComponentModel
 from autogen_core.logging import LLMCallEvent
 
+from pydantic import ValidationError
+
 from ..datamodel.types import EnvironmentVariable, LLMCallEventMessage, TeamResult
 from ..web.managers.run_context import RunContext
 
@@ -132,7 +134,8 @@ class TeamManager:
                     break
 
                 if isinstance(message, TaskResult):
-                    yield TeamResult(task_result=message, usage="", duration=time.time() - start_time)
+                    normalized_result = self._normalize_task_result(message)
+                    yield TeamResult(task_result=normalized_result, usage="", duration=time.time() - start_time)
                 else:
                     yield message
 
@@ -166,11 +169,43 @@ class TeamManager:
         try:
             team = await self._create_team(team_config, input_func, env_vars)
             result = await team.run(task=task, cancellation_token=cancellation_token)
+            normalized_result = self._normalize_task_result(result)
 
-            return TeamResult(task_result=result, usage="", duration=time.time() - start_time)
+            return TeamResult(task_result=normalized_result, usage="", duration=time.time() - start_time)
 
         finally:
             if team and hasattr(team, "_participants"):
                 for agent in team._participants:  # type: ignore
                     if hasattr(agent, "close"):
                         await agent.close()
+    @staticmethod
+    def _normalize_task_result(result: Any) -> TaskResult:
+        """Ensure the returned value can be represented as a :class:`TaskResult`."""
+        if isinstance(result, TaskResult):
+            return result
+
+        if isinstance(result, dict):
+            try:
+                return TaskResult.model_validate(result)
+            except ValidationError:
+                logger.debug("Failed to validate task result from dict", exc_info=True)
+
+        messages: List[BaseAgentEvent | BaseChatMessage] = []
+        raw_messages = getattr(result, "messages", None)
+        if isinstance(raw_messages, Sequence) and not isinstance(raw_messages, (str, bytes)):
+            filtered_messages: List[BaseAgentEvent | BaseChatMessage] = []
+            for message in raw_messages:
+                if isinstance(message, (BaseAgentEvent, BaseChatMessage)):
+                    filtered_messages.append(message)
+            messages = filtered_messages
+
+        stop_reason = getattr(result, "stop_reason", None)
+        if stop_reason is not None and not isinstance(stop_reason, str):
+            stop_reason = str(stop_reason)
+
+        try:
+            return TaskResult(messages=messages, stop_reason=stop_reason)
+        except ValidationError:
+            logger.debug("Failed to normalize task result; falling back to empty result", exc_info=True)
+            return TaskResult(messages=[])
+
