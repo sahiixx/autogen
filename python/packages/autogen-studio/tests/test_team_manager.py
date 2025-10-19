@@ -174,8 +174,9 @@ class TestTeamManager:
         team_manager = TeamManager()
         with patch.object(team_manager, "_create_team") as mock_create:
             mock_team = MagicMock()
+            from autogen_agentchat.base import TaskResult
             async def mock_run(*args, **kwargs):
-                return MagicMock(name="task_result")
+                return TaskResult(messages=[], stop_reason="test")
             mock_team.run = mock_run
             mock_create.return_value = mock_team
             result = await team_manager.run(task="task", team_config=sample_config)
