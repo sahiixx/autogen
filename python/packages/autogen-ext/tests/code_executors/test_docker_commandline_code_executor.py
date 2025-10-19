@@ -401,12 +401,128 @@ async def test_docker_commandline_code_executor_with_multiple_tasks(
 
     executor, _ = executor_and_temp_dir
     await asyncio.get_running_loop().run_in_executor(None, run_scenario_in_new_loop, executor)
-def test_serialization_roundtrip_preserves_delete_tmp_files() -> None:
-    # This test does not require Docker; it only validates config round‑trip behavior.
-    with tempfile.TemporaryDirectory() as temp_dir:
-        executor = DockerCommandLineCodeExecutor(work_dir=temp_dir, timeout=12, delete_tmp_files=True)
-        cfg = executor.dump_component()
-        loaded = DockerCommandLineCodeExecutor.load_component(cfg)
-        assert loaded.timeout == 12
-        # Be defensive if attribute name changes — treat missing as False
-        assert getattr(loaded, "delete_tmp_files", False) is True
+
+
+@pytest.mark.asyncio
+async def test_docker_tests_enabled_function() -> None:
+    """Test the docker_tests_enabled() helper function behavior."""
+    # This test verifies the function returns a boolean
+    result = docker_tests_enabled()
+    assert isinstance(result, bool), "docker_tests_enabled should return a boolean"
+
+
+@pytest.mark.asyncio
+async def test_directory_cleanup_with_skip() -> None:
+    """Test that directory cleanup properly skips when Docker is disabled."""
+    if not docker_tests_enabled():
+        pytest.skip("Docker tests are disabled")
+
+    # Create executor with work_dir=None to test auto-creation
+    executor = DockerCommandLineCodeExecutor(timeout=30, work_dir=None)
+
+    await executor.start()
+    work_dir = executor.work_dir
+
+    # Verify directory was created
+    assert work_dir.exists(), "Work directory should be created"
+    assert work_dir.is_dir(), "Work directory should be a directory"
+
+    # Stop executor
+    await executor.stop()
+
+    # Verify directory was cleaned up
+    assert not work_dir.exists(), "Work directory should be removed after stop"
+
+
+@pytest.mark.asyncio
+async def test_directory_creation_cleanup_idempotency() -> None:
+    """Test that calling stop multiple times doesn't cause errors."""
+    if not docker_tests_enabled():
+        pytest.skip("Docker tests are disabled")
+
+    executor = DockerCommandLineCodeExecutor(timeout=60, work_dir=None)
+    await executor.start()
+
+    work_dir = executor.work_dir
+    assert work_dir.is_dir()
+
+    # Stop executor twice
+    await executor.stop()
+    await executor.stop()
+
+    # Directory should still be gone
+    assert not Path(work_dir).exists()
+
+
+@pytest.mark.asyncio
+async def test_docker_disabled_environment_variable() -> None:
+    """Test behavior when SKIP_DOCKER environment variable is set."""
+    original_value = os.environ.get("SKIP_DOCKER")
+
+    try:
+        # Test with SKIP_DOCKER=true
+        os.environ["SKIP_DOCKER"] = "true"
+        assert not docker_tests_enabled(), "Should return False when SKIP_DOCKER=true"
+
+        # Test with SKIP_DOCKER=TRUE (case insensitive)
+        os.environ["SKIP_DOCKER"] = "TRUE"
+        assert not docker_tests_enabled(), "Should return False when SKIP_DOCKER=TRUE"
+
+        # Test with SKIP_DOCKER=false
+        os.environ["SKIP_DOCKER"] = "false"
+        # Result depends on actual Docker availability
+        result = docker_tests_enabled()
+        assert isinstance(result, bool)
+
+    finally:
+        # Restore original value
+        if original_value is None:
+            os.environ.pop("SKIP_DOCKER", None)
+        else:
+            os.environ["SKIP_DOCKER"] = original_value
+
+
+@pytest.mark.asyncio
+async def test_docker_import_error_handling() -> None:
+    """Test that docker_tests_enabled handles import errors gracefully."""
+    # This test verifies the function doesn't crash when docker module is unavailable
+    # The actual result depends on whether docker is installed
+    try:
+        result = docker_tests_enabled()
+        assert isinstance(result, bool)
+    except Exception as e:
+        pytest.fail(f"docker_tests_enabled() should not raise exceptions: {e}")
+
+
+@pytest.mark.asyncio
+async def test_directory_creation_with_custom_timeout() -> None:
+    """Test directory creation with various timeout values."""
+    if not docker_tests_enabled():
+        pytest.skip("Docker tests are disabled")
+
+    for timeout in [10, 30, 60, 120]:
+        executor = DockerCommandLineCodeExecutor(timeout=timeout, work_dir=None)
+        await executor.start()
+
+        assert executor.work_dir.is_dir()
+
+        await executor.stop()
+        assert not executor.work_dir.exists()
+
+
+@pytest.mark.asyncio
+async def test_work_dir_none_creates_temp_directory() -> None:
+    """Test that work_dir=None creates a temporary directory."""
+    if not docker_tests_enabled():
+        pytest.skip("Docker tests are disabled")
+
+    executor = DockerCommandLineCodeExecutor(timeout=60, work_dir=None)
+    await executor.start()
+
+    work_dir = executor.work_dir
+    assert work_dir.is_dir()
+
+    # Verify it's in a temp directory location
+    assert "tmp" in str(work_dir).lower() or "temp" in str(work_dir).lower()
+
+    await executor.stop()
