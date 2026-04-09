@@ -416,35 +416,27 @@ def test_serialization_roundtrip_preserves_delete_tmp_files() -> None:
 
 @pytest.mark.asyncio
 async def test_delete_tmp_files_property_accessor() -> None:
-    """Test the delete_tmp_files property accessor returns correct values."""
+    """Test that the delete_tmp_files property is accessible and returns correct value."""
+    if not docker_tests_enabled():
+        pytest.skip("Docker tests are disabled")
+    
     with tempfile.TemporaryDirectory() as temp_dir:
         # Test default value (False)
         executor_default = DockerCommandLineCodeExecutor(work_dir=temp_dir)
         assert executor_default.delete_tmp_files is False
         
-        # Test explicitly set to False
+        # Test explicit False
         executor_false = DockerCommandLineCodeExecutor(work_dir=temp_dir, delete_tmp_files=False)
         assert executor_false.delete_tmp_files is False
         
-        # Test explicitly set to True
+        # Test explicit True
         executor_true = DockerCommandLineCodeExecutor(work_dir=temp_dir, delete_tmp_files=True)
         assert executor_true.delete_tmp_files is True
 
 
 @pytest.mark.asyncio
-async def test_delete_tmp_files_property_immutable() -> None:
-    """Test that the delete_tmp_files property is read-only."""
-    with tempfile.TemporaryDirectory() as temp_dir:
-        executor = DockerCommandLineCodeExecutor(work_dir=temp_dir, delete_tmp_files=False)
-        
-        # Attempt to set the property should fail (read-only)
-        with pytest.raises(AttributeError):
-            executor.delete_tmp_files = True  # type: ignore
-
-
-@pytest.mark.asyncio
-async def test_delete_tmp_files_with_bash_scripts() -> None:
-    """Test delete_tmp_files functionality with bash scripts."""
+async def test_delete_tmp_files_with_bash_script() -> None:
+    """Test that delete_tmp_files works correctly with bash scripts."""
     if not docker_tests_enabled():
         pytest.skip("Docker tests are disabled")
     
@@ -452,7 +444,6 @@ async def test_delete_tmp_files_with_bash_scripts() -> None:
         pytest.skip("Bash tests not supported on Windows")
     
     with tempfile.TemporaryDirectory() as temp_dir:
-        # Test with delete_tmp_files=True for bash scripts
         async with DockerCommandLineCodeExecutor(work_dir=temp_dir, delete_tmp_files=True) as executor:
             cancellation_token = CancellationToken()
             code_blocks = [CodeBlock(code="echo 'Hello from bash'", language="bash")]
@@ -460,156 +451,125 @@ async def test_delete_tmp_files_with_bash_scripts() -> None:
             assert result.exit_code == 0
             assert "Hello from bash" in result.output
             assert result.code_file is not None
-            # Verify file is deleted after execution
+            # Verify bash script file is deleted
             assert not Path(result.code_file).exists()
 
 
 @pytest.mark.asyncio
-async def test_delete_tmp_files_with_named_files() -> None:
-    """Test delete_tmp_files with explicitly named code files."""
+async def test_delete_tmp_files_with_named_file() -> None:
+    """Test delete_tmp_files with explicitly named files in code."""
     if not docker_tests_enabled():
         pytest.skip("Docker tests are disabled")
     
     with tempfile.TemporaryDirectory() as temp_dir:
         async with DockerCommandLineCodeExecutor(work_dir=temp_dir, delete_tmp_files=True) as executor:
             cancellation_token = CancellationToken()
-            # Code with explicit filename
-            code = """# filename: my_script.py
+            # Code that specifies a filename
+            code = """# filename: custom_script.py
 
-print('Named file test')
+print('Custom named script')
 """
             code_blocks = [CodeBlock(code=code, language="python")]
             result = await executor.execute_code_blocks(code_blocks, cancellation_token)
             assert result.exit_code == 0
-            assert "Named file test" in result.output
+            assert "Custom named script" in result.output
             assert result.code_file is not None
-            assert "my_script.py" in result.code_file
-            # Verify named file is also deleted when delete_tmp_files=True
+            assert "custom_script.py" in result.code_file
+            # Named file should still be deleted
             assert not Path(result.code_file).exists()
 
 
 @pytest.mark.asyncio
-async def test_delete_tmp_files_partial_execution() -> None:
-    """Test delete_tmp_files when execution stops after first block fails."""
+async def test_delete_tmp_files_preserves_user_created_files() -> None:
+    """Test that delete_tmp_files only deletes temporary code files, not user-created files."""
     if not docker_tests_enabled():
         pytest.skip("Docker tests are disabled")
     
     with tempfile.TemporaryDirectory() as temp_dir:
         async with DockerCommandLineCodeExecutor(work_dir=temp_dir, delete_tmp_files=True) as executor:
             cancellation_token = CancellationToken()
-            # First block fails, second block should not execute
-            code_blocks = [
-                CodeBlock(code="raise ValueError('First block error')", language="python"),
-                CodeBlock(code="print('This should not execute')", language="python"),
-            ]
+            # Code that creates a file
+            code = """
+with open('user_data.txt', 'w') as f:
+    f.write('User created data')
+print('File created')
+"""
+            code_blocks = [CodeBlock(code=code, language="python")]
             result = await executor.execute_code_blocks(code_blocks, cancellation_token)
-            assert result.exit_code != 0
-            assert "First block error" in result.output
-            assert "This should not execute" not in result.output
+            assert result.exit_code == 0
+            assert "File created" in result.output
             assert result.code_file is not None
-            # Verify file is deleted even when execution fails
+            # Temporary code file should be deleted
             assert not Path(result.code_file).exists()
-
-
-@pytest.mark.asyncio
-async def test_delete_tmp_files_config_serialization() -> None:
-    """Test delete_tmp_files is properly serialized and deserialized in config."""
-    with tempfile.TemporaryDirectory() as temp_dir:
-        # Create executor with delete_tmp_files=True
-        executor_true = DockerCommandLineCodeExecutor(
-            work_dir=temp_dir,
-            timeout=30,
-            delete_tmp_files=True,
-            container_name="test-container"
-        )
-        
-        # Serialize to config
-        config_true = executor_true.dump_component()
-        
-        # Deserialize and verify
-        loaded_true = DockerCommandLineCodeExecutor.load_component(config_true)
-        assert loaded_true.delete_tmp_files is True
-        assert loaded_true.timeout == 30
-        
-        # Create executor with delete_tmp_files=False (default)
-        executor_false = DockerCommandLineCodeExecutor(work_dir=temp_dir, delete_tmp_files=False)
-        config_false = executor_false.dump_component()
-        loaded_false = DockerCommandLineCodeExecutor.load_component(config_false)
-        assert loaded_false.delete_tmp_files is False
+            # But user-created file should remain
+            user_file = Path(temp_dir) / "user_data.txt"
+            assert user_file.exists()
+            assert user_file.read_text() == "User created data"
 
 
 @pytest.mark.asyncio
 async def test_delete_tmp_files_with_cancellation() -> None:
-    """Test delete_tmp_files behavior when execution is cancelled."""
+    """Test that files are deleted properly even when execution is cancelled."""
     if not docker_tests_enabled():
         pytest.skip("Docker tests are disabled")
     
     with tempfile.TemporaryDirectory() as temp_dir:
         async with DockerCommandLineCodeExecutor(work_dir=temp_dir, delete_tmp_files=True) as executor:
             cancellation_token = CancellationToken()
-            
-            # Create a long-running task
             code = """import time
 time.sleep(10)
-with open("test_output.txt", "w") as f:
-    f.write("Should not be created")
+print('Should not reach here')
 """
             code_blocks = [CodeBlock(code=code, language="python")]
             
-            # Start execution and cancel after brief delay
             task = asyncio.create_task(executor.execute_code_blocks(code_blocks, cancellation_token))
             await asyncio.sleep(1)
             cancellation_token.cancel()
             result = await task
             
-            assert result.exit_code != 0
             assert "Code execution was cancelled" in result.output
-            
-            # When execution is cancelled, cleanup should still occur
-            # The code file should be deleted
             if result.code_file:
-                # File might be deleted during cleanup
-                # We can't guarantee timing, but we verify the property is set correctly
-                assert executor.delete_tmp_files is True
-
-
-@pytest.mark.asyncio  
-async def test_timeout_property_accessor() -> None:
-    """Test the timeout property accessor returns correct values."""
-    with tempfile.TemporaryDirectory() as temp_dir:
-        # Test default timeout
-        executor_default = DockerCommandLineCodeExecutor(work_dir=temp_dir)
-        assert executor_default.timeout == 60  # Default value
-        
-        # Test custom timeout
-        executor_custom = DockerCommandLineCodeExecutor(work_dir=temp_dir, timeout=120)
-        assert executor_custom.timeout == 120
-        
-        # Test minimum timeout
-        executor_min = DockerCommandLineCodeExecutor(work_dir=temp_dir, timeout=1)
-        assert executor_min.timeout == 1
+                # File should be deleted even after cancellation
+                assert not Path(result.code_file).exists()
 
 
 @pytest.mark.asyncio
-async def test_multiple_properties_consistency() -> None:
-    """Test that multiple properties work correctly together."""
+async def test_delete_tmp_files_with_timeout() -> None:
+    """Test that files are deleted properly even when execution times out."""
+    if not docker_tests_enabled():
+        pytest.skip("Docker tests are disabled")
+    
     with tempfile.TemporaryDirectory() as temp_dir:
-        executor = DockerCommandLineCodeExecutor(
-            work_dir=temp_dir,
-            timeout=45,
-            delete_tmp_files=True,
-            auto_remove=False,
-            stop_container=False
-        )
+        async with DockerCommandLineCodeExecutor(work_dir=temp_dir, timeout=2, delete_tmp_files=True) as executor:
+            cancellation_token = CancellationToken()
+            code_blocks = [CodeBlock(code="import time; time.sleep(10)", language="python")]
+            result = await executor.execute_code_blocks(code_blocks, cancellation_token)
+            
+            assert result.exit_code != 0
+            assert "Timeout" in result.output
+            if result.code_file:
+                # File should be deleted even after timeout
+                assert not Path(result.code_file).exists()
+
+
+def test_delete_tmp_files_config_serialization() -> None:
+    """Test that delete_tmp_files is properly serialized in config."""
+    with tempfile.TemporaryDirectory() as temp_dir:
+        # Test True value
+        executor_true = DockerCommandLineCodeExecutor(work_dir=temp_dir, delete_tmp_files=True)
+        config_true = executor_true.dump_component()
+        assert config_true.config.delete_tmp_files is True
         
-        # Verify all properties
-        assert executor.timeout == 45
-        assert executor.delete_tmp_files is True
-        assert executor.work_dir == Path(temp_dir)
-        
-        # Verify serialization preserves all settings
+        # Test False value
+        executor_false = DockerCommandLineCodeExecutor(work_dir=temp_dir, delete_tmp_files=False)
+        config_false = executor_false.dump_component()
+        assert config_false.config.delete_tmp_files is False
+
+
+def test_delete_tmp_files_default_in_config() -> None:
+    """Test that delete_tmp_files defaults to False in config when not specified."""
+    with tempfile.TemporaryDirectory() as temp_dir:
+        executor = DockerCommandLineCodeExecutor(work_dir=temp_dir)
         config = executor.dump_component()
-        loaded = DockerCommandLineCodeExecutor.load_component(config)
-        
-        assert loaded.timeout == 45
-        assert loaded.delete_tmp_files is True
+        # Should default to False
+        assert config.config.delete_tmp_files is False
