@@ -401,6 +401,8 @@ async def test_docker_commandline_code_executor_with_multiple_tasks(
 
     executor, _ = executor_and_temp_dir
     await asyncio.get_running_loop().run_in_executor(None, run_scenario_in_new_loop, executor)
+
+
 def test_serialization_roundtrip_preserves_delete_tmp_files() -> None:
     # This test does not require Docker; it only validates config round‑trip behavior.
     with tempfile.TemporaryDirectory() as temp_dir:
